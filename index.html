@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo Kiến trúc & Đặc tả Chi tiết Hệ thống TechShare</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <!-- KaTeX for Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body);"></script>
+  <!-- Mermaid JS for Sequence Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ 
+      startOnLoad: true, 
+      theme: 'default',
+      securityLevel: 'loose',
+      sequence: {
+        useMaxWidth: false,
+        boxMargin: 10,
+        noteMargin: 10,
+        messageMargin: 35
+      }
+    });
+  </script>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .code-tag {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.375rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.825em;
+      border: 1px solid #e2e8f0;
+      word-break: break-word;
+      display: inline-block;
+    }
+    /* Custom Scrollbar for Mermaid Container */
+    .mermaid-scroll-container::-webkit-scrollbar {
+      height: 6px;
+    }
+    .mermaid-scroll-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .mermaid-scroll-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .mermaid-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
+
+  <!-- Header Sticky Bar -->
+  <header class="bg-slate-900/95 backdrop-blur-md text-white sticky top-0 z-40 border-b border-slate-800 shadow-md transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <button id="mobileMenuBtn" aria-label="Mở menu điều hướng" class="lg:hidden p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[44px] min-h-[44px] flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <span class="bg-blue-600 text-white font-bold px-3 py-1.5 rounded-lg text-base sm:text-lg tracking-wide shadow-sm">TechShare</span>
+        <h1 class="text-sm sm:text-base lg:text-lg font-semibold text-slate-200 hidden md:block truncate max-w-xs lg:max-w-md">Báo cáo Kiến trúc & Đặc tả Chi tiết</h1>
+      </div>
+      <a href="#summary-table" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs sm:text-sm font-medium px-3.5 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5 min-h-[44px]">
+        <span>Bảng tổng quan</span>
+        <svg class="w-4 h-4 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Mobile Off-Canvas Navigation Drawer Overlay -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden"></div>
+
+  <!-- Mobile Drawer Content -->
+  <aside id="mobileDrawer" class="fixed top-0 left-0 bottom-0 w-4/5 max-w-xs bg-white z-50 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden flex flex-col">
+    <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+      <span class="font-bold text-lg text-blue-400">Danh mục tính năng</span>
+      <button id="closeDrawerBtn" aria-label="Đóng menu" class="p-2 text-slate-400 hover:text-white rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <nav class="p-4 space-y-1 overflow-y-auto flex-1 text-sm font-medium">
+      <a href="#feature-1" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">1. Login Người dùng</a>
+      <a href="#feature-2" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">2. Admin Login</a>
+      <a href="#feature-3" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">3. Forgot Password</a>
+      <a href="#feature-4" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">4. eKYC Người thuê</a>
+      <a href="#feature-5" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">5. eKYC Chủ thiết bị</a>
+      <a href="#feature-6" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">6. Đăng ký & OTP</a>
+      <a href="#feature-7" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">7. Profile & Trust Score</a>
+      <a href="#feature-8" class="drawer-link block px-3.5 py-3 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition border-b border-slate-100">8. Banner / Ban Account</a>
+      <a href="#summary-table" class="drawer-link block px-3.5 py-3 rounded-lg font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition mt-4 text-center">Bảng tổng kết hệ thống</a>
+    </nav>
+  </aside>
+
+  <!-- Layout Container -->
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+
+    <!-- Desktop Sidebar Navigation -->
+    <aside class="hidden lg:block w-64 flex-shrink-0">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 sticky top-24">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Mục lục tính năng</h2>
+        <nav class="space-y-1 text-sm font-medium">
+          <a href="#feature-1" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">1. Login Người dùng</a>
+          <a href="#feature-2" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">2. Admin Login</a>
+          <a href="#feature-3" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">3. Forgot Password</a>
+          <a href="#feature-4" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">4. eKYC Người thuê</a>
+          <a href="#feature-5" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">5. eKYC Chủ thiết bị</a>
+          <a href="#feature-6" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">6. Đăng ký & OTP</a>
+          <a href="#feature-7" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">7. Profile & Trust Score</a>
+          <a href="#feature-8" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition">8. Banner / Ban Account</a>
+          <a href="#summary-table" class="block px-3 py-2.5 rounded-lg font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition mt-4 text-center">Tổng kết hệ thống</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 min-w-0 space-y-8 sm:space-y-12">
+
+      <!-- Hero Header Banner -->
+      <section class="bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 text-white rounded-2xl p-5 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10">
+          <span class="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold mb-3 border border-blue-500/30">System Architecture Docs v1.0</span>
+          <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight leading-snug mb-3">
+            BÁO CÁO KIẾN TRÚC & ĐẶC TẢ CHI TIẾT CÁC TÍNH NĂNG HỆ THỐNG TECHSHARE
+          </h1>
+          <p class="text-slate-300 leading-relaxed text-xs sm:text-sm md:text-base max-w-3xl">
+            Tài liệu này thống kê chi tiết kiến trúc, danh sách file (Frontend & Backend), danh sách hàm/phương thức, luồng dữ liệu (Data Flow) và cách các file liên kết, tương tác với nhau cho 8 tính năng cốt lõi của nền tảng TechShare.
+          </p>
+        </div>
+      </section>
+
+      <!-- Feature 1 -->
+      <section id="feature-1" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">1. TÍNH NĂNG 1: ĐĂNG NHẬP NGƯỜI DÙNG (LOGIN)</h2>
+          <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">Core Auth</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-blue-700 block mb-2 text-xs uppercase tracking-wider">Frontend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">client/src/pages/LoginPage.jsx</span>: Giao diện form đăng nhập và xử lý sự kiện submit.</li>
+                <li><span class="code-tag">client/src/context/AuthContext.jsx</span>: Quản lý trạng thái xác thực toàn cục, lưu token, thông tin <span class="code-tag">user</span> và <span class="code-tag">account</span>.</li>
+                <li><span class="code-tag">client/src/services/api.js</span>: Cấu hình HTTP client (Axios), tự động đính kèm JWT Bearer token và bắt lỗi 403 (khóa tài khoản).</li>
+                <li><span class="code-tag">client/src/routes/routes.js</span>: Định tuyến ứng dụng, bảo vệ các trang yêu cầu đăng nhập (<span class="code-tag">PrivateRoute</span>).</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/routes/authRoutes.js</span>: Định tuyến endpoint API đăng nhập (<span class="code-tag">POST /api/auth/login</span>).</li>
+                <li><span class="code-tag">server/src/controllers/authController.js</span>: Chứa hàm controller xử lý logic đăng nhập (<span class="code-tag">login</span>).</li>
+                <li><span class="code-tag">server/src/models/Account.js</span>: Mongoose Model cho collection <span class="code-tag">accounts</span> (xác thực và bảo mật).</li>
+                <li><span class="code-tag">server/src/models/User.js</span>: Mongoose Model cho collection <span class="code-tag">users</span> (thông tin hồ sơ).</li>
+                <li><span class="code-tag">server/src/models/Role.js</span>: Mongoose Model cho collection <span class="code-tag">roles</span> (phân quyền).</li>
+                <li><span class="code-tag">server/src/config/env.js</span>: Cấu hình Secret Key và thời hạn hết hạn của JWT (<span class="code-tag">getJwtConfig</span>).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend:</strong>
+              <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+                <li><span class="code-tag">LoginPage.jsx</span>: <span class="code-tag">handleSubmit(e)</span> - Thu thập dữ liệu form (<span class="code-tag">identifier</span>, <span class="code-tag">password</span>), kiểm tra validation, gọi API đăng nhập.</li>
+                <li><span class="code-tag">AuthContext.jsx</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">login(authData)</span>: Lưu <span class="code-tag">token</span>, <span class="code-tag">user</span>, <span class="code-tag">account</span> vào React State và <span class="code-tag">localStorage</span> (<span class="code-tag">techshare_token</span>, <span class="code-tag">techshare_user</span>, <span class="code-tag">techshare_account</span>).</li>
+                    <li><span class="code-tag">logout()</span>: Xóa sạch dữ liệu đăng nhập khỏi State và <span class="code-tag">localStorage</span>.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">api.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">api.interceptors.request.use()</span>: Tự động chèn header <span class="code-tag">Authorization: Bearer &lt;token&gt;</span>.</li>
+                    <li><span class="code-tag">api.interceptors.response.use()</span>: Bắt mã lỗi 401 (hết hạn phiên) và 403 (<span class="code-tag">isbanned</span>).</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend:</strong>
+              <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+                <li><span class="code-tag">authController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">login(req, res)</span>: Tiếp nhận request, xác minh thông tin tài khoản, kiểm tra khóa tài khoản, so khớp mật khẩu và ký JWT.</li>
+                    <li><span class="code-tag">resolveRoleCode(account, user)</span>: Tra cứu mã quyền (<span class="code-tag">renter</span>, <span class="code-tag">owner</span>, <span class="code-tag">admin</span>) từ <span class="code-tag">roleId</span> trong collection <span class="code-tag">roles</span>.</li>
+                    <li><span class="code-tag">generateToken(payload)</span>: Sử dụng thư viện <span class="code-tag">jsonwebtoken</span> để tạo chuỗi JWT.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0"></span> C. Luồng hoạt động & Cách các file liên kết với nhau
+          </h3>
+          <div class="relative bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-xs text-slate-400 p-2 text-right sm:hidden bg-slate-100 rounded-t-xl flex items-center justify-end gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+              <span>Vuốt ngang để xem sơ đồ</span>
+            </div>
+            <div class="mermaid-scroll-container overflow-x-auto p-2 sm:p-4 touch-pan-x">
+              <pre class="mermaid min-w-[650px] text-center">
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant LP as LoginPage.jsx
+    participant AC as AuthContext.jsx
+    participant AR as authRoutes.js
+    participant ACtrl as authController.js
+    participant DB as MongoDB (accounts, users, roles)
+
+    User->>LP: Nhập username/email và mật khẩu, bấm Đăng nhập
+    LP->>LP: handleSubmit() kiểm tra hợp lệ
+    LP->>AR: POST /api/auth/login { identifier, password, portal: 'client' }
+    AR->>ACtrl: Chuyển tiếp tới hàm login()
+    ACtrl->>DB: Account.findOne({ username hoặc email })
+    DB-->>ACtrl: Trả về tài khoản kèm passwordHash & roleId
+    alt Tài khoản bị khóa (isbanned = true hoặc isActive = false)
+        ACtrl-->>LP: 403 Forbidden { isbanned: true, banReason, message }
+        LP-->>User: Hiển thị thông báo tài khoản bị khóa kèm lý do
+    else Tài khoản hợp lệ
+        ACtrl->>ACtrl: bcrypt.compare(password, account.passwordHash)
+        ACtrl->>DB: User.findById(account.userId) hoặc User.findOne({ accountId })
+        DB-->>ACtrl: Trả về hồ sơ User
+        ACtrl->>ACtrl: resolveRoleCode() lấy mã quyền
+        ACtrl->>ACtrl: generateToken({ accountId, userId, username, email, role })
+        ACtrl-->>LP: 200 OK { token, account, user }
+        LP->>AC: login({ token, user, account })
+        AC->>AC: Lưu vào localStorage & cập nhật State
+        LP->>User: Điều hướng vào trang Dashboard/Home
+    end
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 2 -->
+      <section id="feature-2" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">2. TÍNH NĂNG 2: ĐĂNG NHẬP QUẢN TRỊ VIÊN (ADMIN LOGIN)</h2>
+          <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-1 rounded-full">Admin Auth</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-purple-700 block mb-2 text-xs uppercase tracking-wider">Admin Frontend (EJS / SSR):</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/views/admin/login.ejs</span>: Giao diện HTML/EJS trang đăng nhập dành riêng cho Admin.</li>
+                <li><span class="code-tag">server/src/public/js/admin/login.js</span>: Script client-side lắng nghe submit, gọi API và lưu trữ cookie/token.</li>
+                <li><span class="code-tag">server/src/views/admin/layouts/main.ejs</span>: Layout khung sườn chung của Admin Portal.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/routes/adminPageRoutes.js</span>: Định tuyến render trang Admin Login (<span class="code-tag">GET /admin/login</span>).</li>
+                <li><span class="code-tag">server/src/controllers/admin/adminPageController.js</span>: Controller điều hướng render giao diện EJS (<span class="code-tag">renderAdminLoginPage</span>).</li>
+                <li><span class="code-tag">server/src/routes/authRoutes.js</span>: Tiếp nhận request API đăng nhập (<span class="code-tag">POST /api/auth/login</span>).</li>
+                <li><span class="code-tag">server/src/controllers/authController.js</span>: Xử lý phân quyền Admin (<span class="code-tag">login</span> với <span class="code-tag">portal: 'admin'</span>).</li>
+                <li><span class="code-tag">server/src/middlewares/adminPageAuthMiddleware.js</span>: Middleware bảo vệ tất cả trang admin (<span class="code-tag">requireAdminPageAuth</span>).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend / Script:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">public/js/admin/login.js</span>: Lắng nghe event <span class="code-tag">submit</span> trên <span class="code-tag">#adminLoginForm</span>, kiểm tra dữ liệu đầu vào <span class="code-tag">#adminIdentifier</span>, <span class="code-tag">#adminPassword</span>, gọi <span class="code-tag">fetch('/api/auth/login', { body: { identifier, password, portal: 'admin' } })</span>.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">adminPageController.js</span>: <span class="code-tag">renderAdminLoginPage(req, res)</span> - Kiểm tra token hợp lệ trong cookie thì chuyển hướng ngay tới <span class="code-tag">/admin/dashboard</span>, ngược lại render file <span class="code-tag">admin/login.ejs</span>.</li>
+                <li><span class="code-tag">authController.js</span>: <span class="code-tag">login(req, res)</span> - Khi <span class="code-tag">portal === 'admin'</span>, kiểm tra nghiêm ngặt <span class="code-tag">roleCode === 'admin'</span>. Nếu là user thường cố tình đăng nhập admin, từ chối với lỗi 401. Đồng thời thiết lập cookie bảo mật <span class="code-tag">techshare_admin_token</span> với <span class="code-tag">httpOnly: true</span>.</li>
+                <li><span class="code-tag">adminPageAuthMiddleware.js</span>: <span class="code-tag">requireAdminPageAuth(req, res, next)</span> - Đọc token từ cookie <span class="code-tag">techshare_admin_token</span>, xác thực giải mã JWT, kiểm tra <span class="code-tag">isbanned</span> và quyền admin trước khi cho phép vào các trang quản trị.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-600 flex-shrink-0"></span> C. Luồng hoạt động & Cách các file liên kết với nhau
+          </h3>
+          <ol class="list-decimal pl-5 space-y-2 text-xs sm:text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <li>Quản trị viên truy cập <span class="code-tag">/admin/login</span>, <span class="code-tag">adminPageRoutes.js</span> gọi <span class="code-tag">adminPageController.renderAdminLoginPage()</span>.</li>
+            <li>Trình duyệt hiển thị <span class="code-tag">login.ejs</span>, file script <span class="code-tag">public/js/admin/login.js</span> được kích hoạt.</li>
+            <li>Khi submit, script gửi <span class="code-tag">POST /api/auth/login</span> kèm cờ <span class="code-tag">{ portal: 'admin' }</span>.</li>
+            <li><span class="code-tag">authController.login()</span> xác thực mật khẩu qua bcrypt, kiểm tra <span class="code-tag">resolveRoleCode()</span> có quyền <span class="code-tag">admin</span> hay không.</li>
+            <li>Nếu hợp lệ, server thiết lập cookie <span class="code-tag">techshare_admin_token</span>, trả về JSON thành công.</li>
+            <li><span class="code-tag">login.js</span> nhận phản hồi và điều hướng sang <span class="code-tag">/admin/dashboard</span>.</li>
+            <li>Các trang admin tiếp theo đều được kiểm soát bởi <span class="code-tag">adminPageAuthMiddleware.requireAdminPageAuth()</span>.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Feature 3 -->
+      <section id="feature-3" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">3. TÍNH NĂNG 3: QUÊN MẬT KHẨU & KHÔI PHỤC QUA OTP (FORGOT PASSWORD)</h2>
+          <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full">Recovery</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-amber-700 block mb-2 text-xs uppercase tracking-wider">Frontend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">client/src/pages/ForgotPasswordPage.jsx</span>: Giao diện 2 bước (Bước 1: Nhập email nhận OTP; Bước 2: Nhập mã 6 chữ số và mật khẩu mới).</li>
+                <li><span class="code-tag">client/src/services/api.js</span>: Thực thi request API Axios.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/routes/authRoutes.js</span>: Định tuyến API (<span class="code-tag">/forgot-password</span>, <span class="code-tag">/reset-password</span>, <span class="code-tag">/resend-reset-otp</span>).</li>
+                <li><span class="code-tag">server/src/controllers/authController.js</span>: Xử lý sinh OTP, kiểm tra OTP và cập nhật mật khẩu.</li>
+                <li><span class="code-tag">server/src/services/emailService.js</span>: Dịch vụ gửi email thông qua Nodemailer & Gmail App Password.</li>
+                <li><span class="code-tag">server/src/models/Otp.js</span>: Collection <span class="code-tag">otps</span> lưu trữ mã xác minh với thời hạn 5 phút.</li>
+                <li><span class="code-tag">server/src/models/Account.js</span>: Cập nhật mật khẩu mã hóa mới.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend (<span class="code-tag">ForgotPasswordPage.jsx</span>):</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">handleSendOtp(e)</span>: Gửi email lên backend để yêu cầu cấp mã xác thực OTP.</li>
+                <li><span class="code-tag">handleResetPassword(e)</span>: Gửi OTP cùng mật khẩu mới lên server để đổi mật khẩu.</li>
+                <li><span class="code-tag">handleResendOtp()</span>: Kích hoạt đếm ngược 60 giây và gửi lại mã OTP mới.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">authController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">forgotPassword(req, res)</span>: Kiểm tra email có trong <span class="code-tag">Account</span> hay không, sinh mã ngẫu nhiên 6 số, lưu vào <span class="code-tag">Otp</span> với <span class="code-tag">type: 'reset_password'</span>, gọi <span class="code-tag">sendResetPasswordOtpEmail()</span>.</li>
+                    <li><span class="code-tag">resetPassword(req, res)</span>: Xác thực mã OTP trong <span class="code-tag">Otp</span>, kiểm tra hạn 5 phút, mã hóa mật khẩu mới bằng <span class="code-tag">bcrypt.hash()</span> và cập nhật vào <span class="code-tag">Account</span>.</li>
+                    <li><span class="code-tag">resendResetOtp(req, res)</span>: Làm mới mã OTP và gửi lại email.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">emailService.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">sendResetPasswordOtpEmail(toEmail, otpCode, username)</span>: Tạo transporter và gửi email HTML chứa mã OTP đặt lại mật khẩu.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-600 flex-shrink-0"></span> C. Luồng hoạt động & Cách các file liên kết với nhau
+          </h3>
+          <div class="relative bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-xs text-slate-400 p-2 text-right sm:hidden bg-slate-100 rounded-t-xl flex items-center justify-end gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+              <span>Vuốt ngang để xem sơ đồ</span>
+            </div>
+            <div class="mermaid-scroll-container overflow-x-auto p-2 sm:p-4 touch-pan-x">
+              <pre class="mermaid min-w-[650px] text-center">
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant FP as ForgotPasswordPage.jsx
+    participant AR as authRoutes.js
+    participant ACtrl as authController.js
+    participant ES as emailService.js
+    participant DB as MongoDB (accounts, otps)
+
+    User->>FP: Nhập email, bấm "Gửi mã xác nhận"
+    FP->>AR: POST /api/auth/forgot-password { email }
+    AR->>ACtrl: forgotPassword()
+    ACtrl->>DB: Account.findOne({ email })
+    alt Email không tồn tại
+        ACtrl-->>FP: 404 Không tìm thấy tài khoản
+    else Email hợp lệ
+        ACtrl->>ACtrl: Sinh mã ngẫu nhiên 6 chữ số
+        ACtrl->>DB: Otp.findOneAndUpdate({ email, type: 'reset_password' }, { otp, expiresAt })
+        ACtrl->>ES: sendResetPasswordOtpEmail(email, otpCode)
+        ES-->>User: Gửi hộp thư Gmail mã OTP 6 số
+        ACtrl-->>FP: 200 OK (Chuyển sang Bước 2)
+    end
+
+    User->>FP: Nhập mã OTP 6 số và Mật khẩu mới
+    FP->>AR: POST /api/auth/reset-password { email, otp, newPassword }
+    AR->>ACtrl: resetPassword()
+    ACtrl->>DB: Otp.findOne({ email, type: 'reset_password' })
+    ACtrl->>ACtrl: So khớp OTP & hạn 5 phút
+    ACtrl->>ACtrl: bcrypt.hash(newPassword, salt)
+    ACtrl->>DB: Account.updateOne({ email }, { passwordHash })
+    ACtrl->>DB: Otp.deleteOne({ _id })
+    ACtrl-->>FP: 200 OK Thành công
+    FP-->>User: Thông báo thành công và chuyển hướng sang /login
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 4 -->
+      <section id="feature-4" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">4. TÍNH NĂNG 4: XÁC THỰC DANH TÍNH NGƯỜI THUÊ (eKYC RENTER)</h2>
+          <span class="bg-teal-100 text-teal-800 text-xs font-semibold px-2.5 py-1 rounded-full">Verification</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-teal-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-teal-700 block mb-2 text-xs uppercase tracking-wider">Client Frontend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">client/src/pages/ProfilePage.jsx</span>: Hiển thị huy hiệu trạng thái eKYC (<span class="code-tag">eKYC Verified</span>, <span class="code-tag">eKYC Under Review</span>, <span class="code-tag">Not Verified</span>) và nút mở modal.</li>
+                <li><span class="code-tag">client/src/components/ekyc/EkycSubmitModal.jsx</span>: Modal form tải ảnh 2 mặt CCCD và thông tin cá nhân.</li>
+                <li><span class="code-tag">client/src/services/uploadService.js</span>: Upload ảnh trực tiếp lên Cloudinary.</li>
+                <li><span class="code-tag">client/src/services/api.js</span>: Gọi các API <span class="code-tag">/api/ekyc/status</span> và <span class="code-tag">/api/ekyc/submit</span>.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Admin Moderation & Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/views/admin/ekyc-verification.ejs</span>: Giao diện duyệt đơn eKYC người thuê (chỉ 2 ảnh: Mặt trước, Mặt sau).</li>
+                <li><span class="code-tag">server/src/public/js/admin/ekyc-verification.js</span>: Xử lý xem chi tiết ảnh, kiểm tra validation lý do từ chối (bắt buộc nhập nếu từ chối, có viền đỏ cảnh báo thay thế alert native).</li>
+                <li><span class="code-tag">server/src/routes/ekycRoutes.js</span>: Endpoint nộp và tra cứu đơn (<span class="code-tag">/api/ekyc/status</span>, <span class="code-tag">/api/ekyc/submit</span>).</li>
+                <li><span class="code-tag">server/src/controllers/ekycController.js</span>: Controller tiếp nhận hồ sơ người thuê.</li>
+                <li><span class="code-tag">server/src/routes/adminPageRoutes.js</span>: Route render trang duyệt eKYC người thuê (<span class="code-tag">/admin/ekyc-verification</span>).</li>
+                <li><span class="code-tag">server/src/routes/adminEkycRoutes.js</span>: Endpoint duyệt/từ chối của Admin (<span class="code-tag">PATCH /api/admin/ekyc/:id/status</span>).</li>
+                <li><span class="code-tag">server/src/controllers/adminEkycController.js</span>: Xử lý phê duyệt, cập nhật trạng thái <span class="code-tag">isVerified = true</span> cho User & Account.</li>
+                <li><span class="code-tag">server/src/models/EkycRequest.js</span>: Bắt buộc gắn chặt với collection <span class="code-tag">ekyc_requests</span>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-teal-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">ProfilePage.jsx</span>: <span class="code-tag">useEffect</span> gọi <span class="code-tag">/api/ekyc/status</span> để kiểm tra tiến độ duyệt.</li>
+                <li><span class="code-tag">EkycSubmitModal.jsx</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">handleImageSelect(side, file)</span>: Đọc và preview ảnh CCCD.</li>
+                    <li><span class="code-tag">handleSubmit(e)</span>: Upload ảnh qua <span class="code-tag">uploadToCloudinaryDirect</span>, sau đó gửi thông tin lên backend.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">ekycController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">getMyEkycStatus(req, res)</span>: Truy vấn đơn eKYC mới nhất từ collection <span class="code-tag">ekyc_requests</span>.</li>
+                    <li><span class="code-tag">submitEkycRequest(req, res)</span>: Tạo đơn mới với <span class="code-tag">status: 'pending'</span>, lưu link ảnh CCCD và thông tin định danh.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">adminPageController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">renderEkycVerificationPage(req, res)</span>: Đọc danh sách từ collection <span class="code-tag">ekyc_requests</span>, kết hợp với <span class="code-tag">users</span> để render bảng duyệt.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">adminEkycController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">updateEkycStatus(req, res)</span>: Nếu Approved -> Cập nhật <span class="code-tag">EkycRequest.status = 'approved'</span>, đồng thời cập nhật <span class="code-tag">users.trust.isVerified = true</span> và <span class="code-tag">accounts.isVerified = true</span>. Nếu Rejected -> Cập nhật <span class="code-tag">EkycRequest.status = 'rejected'</span> và lưu <span class="code-tag">rejectionReason</span>. Gửi thông báo đẩy (Notification) tới người dùng.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-teal-600 flex-shrink-0"></span> C. Luồng hoạt động & Cách các file liên kết với nhau
+          </h3>
+          <ol class="list-decimal pl-5 space-y-2 text-xs sm:text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <li>Người thuê mở <span class="code-tag">ProfilePage.jsx</span>, bấm nộp eKYC để mở <span class="code-tag">EkycSubmitModal.jsx</span>.</li>
+            <li>Ảnh CCCD được đẩy lên Cloudinary qua <span class="code-tag">uploadService.js</span>, sau đó gửi <span class="code-tag">POST /api/ekyc/submit</span>.</li>
+            <li><span class="code-tag">ekycController.submitEkycRequest()</span> ghi bản ghi mới vào collection <span class="code-tag">ekyc_requests</span>.</li>
+            <li>Admin truy cập <span class="code-tag">/admin/ekyc-verification</span>. <span class="code-tag">adminPageController.js</span> truy vấn độc quyền collection <span class="code-tag">ekyc_requests</span> và render file <span class="code-tag">ekyc-verification.ejs</span>.</li>
+            <li>Admin xem 2 ảnh, chọn Duyệt hoặc Từ chối:
+              <ul class="list-disc pl-4 mt-1 space-y-1 text-slate-500">
+                <li>Nếu từ chối mà không nhập lý do, <span class="code-tag">public/js/admin/ekyc-verification.js</span> hiển thị viền đỏ và thông báo inline bắt buộc.</li>
+                <li>Khi bấm xác nhận, gọi <span class="code-tag">PATCH /api/admin/ekyc/:id/status</span>.</li>
+              </ul>
+            </li>
+            <li><span class="code-tag">adminEkycController.updateEkycStatus()</span> cập nhật trạng thái <span class="code-tag">approved</span>/<span class="code-tag">rejected</span>, đồng bộ <span class="code-tag">isVerified = true</span> vào cả 2 bảng <span class="code-tag">users</span> và <span class="code-tag">accounts</span>.</li>
+            <li>Đơn sau khi duyệt xong sẽ khóa chỉ cho xem chi tiết (<span class="code-tag">Xem chi tiết</span>), không cho phép chỉnh sửa lại.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Feature 5 -->
+      <section id="feature-5" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">5. TÍNH NĂNG 5: NÂNG CẤP CHỦ THIẾT BỊ (eKYC OWNER UPGRADE)</h2>
+          <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-1 rounded-full">Role Upgrade</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-indigo-700 block mb-2 text-xs uppercase tracking-wider">Client Frontend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">client/src/pages/ProfilePage.jsx</span>: Nút "Upgrade to Owner" (chỉ kích hoạt khi đã xác thực eKYC người thuê), hiển thị huy hiệu <span class="code-tag">Owner Verified</span>, <span class="code-tag">Owner Under Review</span>.</li>
+                <li><span class="code-tag">client/src/components/ekyc/OwnerEkycSubmitModal.jsx</span>: Modal nộp hồ sơ nâng cấp chủ thiết bị yêu cầu <strong>đủ 3 ảnh</strong>: Mặt trước, Mặt sau và <strong>Ảnh chân dung cầm CCCD</strong>.</li>
+                <li><span class="code-tag">client/src/services/ownerEkycService.js</span>: Dịch vụ gọi API <span class="code-tag">/api/owner-ekyc/status</span> và <span class="code-tag">/api/owner-ekyc/submit</span>.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Admin Moderation & Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/views/admin/owner-ekyc-verification.ejs</span>: Giao diện duyệt đơn nâng cấp chủ máy (hiển thị 3 khung ảnh).</li>
+                <li><span class="code-tag">server/src/public/js/admin/owner-ekyc-verification.js</span>: Xử lý mở modal kiểm tra 3 ảnh, validate lý do từ chối inline.</li>
+                <li><span class="code-tag">server/src/routes/ownerEkycRoutes.js</span>: Định tuyến API (<span class="code-tag">/api/owner-ekyc/status</span>, <span class="code-tag">/api/owner-ekyc/submit</span>).</li>
+                <li><span class="code-tag">server/src/controllers/ownerEkycController.js</span>: Controller kiểm tra điều kiện và nhận đơn.</li>
+                <li><span class="code-tag">server/src/routes/adminPageRoutes.js</span>: Route render trang duyệt chủ máy (<span class="code-tag">/admin/owner-verification</span>).</li>
+                <li><span class="code-tag">server/src/routes/adminOwnerEkycRoutes.js</span>: API duyệt của Admin (<span class="code-tag">PATCH /api/admin/owner-ekyc/:id/status</span>).</li>
+                <li><span class="code-tag">server/src/controllers/adminOwnerEkycController.js</span>: Nâng quyền tài khoản lên <span class="code-tag">owner</span> trong cả <span class="code-tag">accounts</span> (roleId) và <span class="code-tag">users</span> (role).</li>
+                <li><span class="code-tag">server/src/models/OwnerEkycRequest.js</span>: Gắn chặt với collection <span class="code-tag">owner_request</span>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">ownerEkycService.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">getMyOwnerEkycStatus()</span>: Tra cứu trạng thái đơn từ <span class="code-tag">/api/owner-ekyc/status</span>.</li>
+                    <li><span class="code-tag">submitOwnerEkycRequest(data)</span>: Gửi 3 link ảnh và thông tin lên <span class="code-tag">/api/owner-ekyc/submit</span>.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">OwnerEkycSubmitModal.jsx</span>: Quản lý 3 trạng thái upload (<span class="code-tag">idCardFront</span>, <span class="code-tag">idCardBack</span>, <span class="code-tag">selfieHoldingId</span>).</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">ownerEkycController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">submitOwnerEkycRequest(req, res)</span>: Kiểm tra user đã hoàn tất eKYC người thuê chưa, kiểm tra đủ 3 ảnh, lưu vào collection <span class="code-tag">owner_request</span>.</li>
+                    <li><span class="code-tag">getMyOwnerEkycStatus(req, res)</span>: Lấy đơn từ <span class="code-tag">OwnerEkycRequest</span>.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">adminPageController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">renderOwnerEkycVerificationPage(req, res)</span>: Truy vấn độc quyền từ collection <span class="code-tag">owner_request</span> và render <span class="code-tag">owner-ekyc-verification.ejs</span>.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">adminOwnerEkycController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">updateOwnerEkycStatus(req, res)</span>: Nếu Approved -> Cập nhật <span class="code-tag">OwnerEkycRequest.status = 'approved'</span>, đổi <span class="code-tag">roleId</span> trong <span class="code-tag">accounts</span> sang mã <span class="code-tag">owner</span>, cập nhật <span class="code-tag">role: 'owner'</span> trong <span class="code-tag">users</span>. Nếu Rejected -> Cập nhật <span class="code-tag">status = 'rejected'</span>, ghi nhận lý do từ chối.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 flex-shrink-0"></span> C. Luồng hoạt động & Cách các file liên kết với nhau
+          </h3>
+          <ol class="list-decimal pl-5 space-y-2 text-xs sm:text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <li>Người thuê đủ điều kiện bấm "Upgrade to Owner" trên <span class="code-tag">ProfilePage.jsx</span>.</li>
+            <li>Modal <span class="code-tag">OwnerEkycSubmitModal.jsx</span> yêu cầu chọn và tải 3 ảnh lên Cloudinary, sau đó gọi <span class="code-tag">ownerEkycService.submitOwnerEkycRequest()</span>.</li>
+            <li>Backend <span class="code-tag">ownerEkycController.js</span> lưu đơn vào collection <span class="code-tag">owner_request</span>.</li>
+            <li>Admin truy cập <span class="code-tag">/admin/owner-verification</span>, <span class="code-tag">adminPageController.js</span> render <span class="code-tag">owner-ekyc-verification.ejs</span> với danh sách đơn nâng cấp.</li>
+            <li>Admin mở modal xem đủ 3 ảnh (đặc biệt là ảnh chân dung cầm CCCD).</li>
+            <li>Khi duyệt: <span class="code-tag">adminOwnerEkycController.js</span> tự động tra cứu quyền <span class="code-tag">owner</span> từ collection <span class="code-tag">roles</span> và gán lại <span class="code-tag">roleId</span> trong <span class="code-tag">accounts</span>, đổi <span class="code-tag">role</span> trong <span class="code-tag">users</span> thành <span class="code-tag">'owner'</span>.</li>
+            <li>Người dùng lập tức có quyền truy cập Owner Dashboard và đăng thiết bị cho thuê.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Feature 6 -->
+      <section id="feature-6" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">6. TÍNH NĂNG 6: ĐĂNG KÝ TÀI KHOẢN & KÍCH HOẠT OTP (REGISTER)</h2>
+          <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full">Onboarding</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Frontend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">client/src/pages/RegisterPage.jsx</span>: Giao diện 2 bước (Bước 1: Điền thông tin cá nhân; Bước 2: Nhập mã xác minh OTP 6 số).</li>
+                <li><span class="code-tag">client/src/context/AuthContext.jsx</span>: Nhận token và tài khoản sau khi kích hoạt để đăng nhập tự động.</li>
+                <li><span class="code-tag">client/src/services/api.js</span>: Gọi API <span class="code-tag">/api/auth/register-init</span> và <span class="code-tag">/api/auth/register-verify-otp</span>.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/routes/authRoutes.js</span>: Định tuyến API đăng ký (<span class="code-tag">/register-init</span>, <span class="code-tag">/register-verify-otp</span>, <span class="code-tag">/resend-otp</span>).</li>
+                <li><span class="code-tag">server/src/controllers/authController.js</span>: Xử lý kiểm tra trùng lặp, gửi OTP, tạo tài khoản nguyên tử kèm cơ chế Rollback.</li>
+                <li><span class="code-tag">server/src/services/emailService.js</span>: Gửi mã OTP xác thực đăng ký qua email.</li>
+                <li><span class="code-tag">server/src/models/Account.js</span>: Tạo bản ghi trong collection <span class="code-tag">accounts</span>.</li>
+                <li><span class="code-tag">server/src/models/User.js</span>: Tạo bản ghi profile trong collection <span class="code-tag">users</span>.</li>
+                <li><span class="code-tag">server/src/models/Otp.js</span>: Lưu trữ payload đăng ký tạm thời trong thời gian chờ nhập OTP.</li>
+                <li><span class="code-tag">server/src/models/Role.js</span>: Cấp phát quyền mặc định <span class="code-tag">renter</span>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend (<span class="code-tag">RegisterPage.jsx</span>):</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">handleInitSubmit(e)</span>: Kiểm tra độ mạnh mật khẩu, trùng khớp mật khẩu, gọi <span class="code-tag">/api/auth/register-init</span>.</li>
+                <li><span class="code-tag">handleVerifyOtp(e)</span>: Thu thập 6 số OTP và gửi lên <span class="code-tag">/api/auth/register-verify-otp</span>.</li>
+                <li><span class="code-tag">handleResendOtp()</span>: Yêu cầu cấp lại mã OTP mới.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend (<span class="code-tag">authController.js</span>):</strong>
+              <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+                <li><span class="code-tag">registerInit(req, res)</span>: Kiểm tra dữ liệu bắt buộc (username >= 3 ký tự, email hợp lệ, password >= 6 ký tự). Kiểm tra trùng lặp: Nếu phát hiện tài khoản mồ côi (có trong <span class="code-tag">accounts</span> nhưng không có trong <span class="code-tag">users</span>), tự động dọn dẹp để người dùng đăng ký lại bình thường. Sinh mã OTP 6 số, mã hóa mật khẩu qua <span class="code-tag">bcrypt.hash()</span>. Lưu vào collection <span class="code-tag">otps</span> (hạn 5 phút) và gọi <span class="code-tag">sendOtpEmail()</span>.</li>
+                <li><span class="code-tag">registerVerifyOtp(req, res)</span>: So khớp mã OTP. Khởi tạo đồng bộ ObjectId cho cả 2 collection (<span class="code-tag">accountId</span>, <span class="code-tag">userId</span>). Lưu <span class="code-tag">newAccount</span> vào <span class="code-tag">accounts</span>. Sinh mã giới thiệu duy nhất <span class="code-tag">referralCode</span> (ví dụ <span class="code-tag">TS...</span>) và lưu <span class="code-tag">newUser</span> vào <span class="code-tag">users</span>.
+                  <div class="mt-1.5 p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 font-medium text-xs">
+                    ⚡ <strong>Cơ chế Rollback:</strong> Bọc <span class="code-tag">newUser.save()</span> trong <span class="code-tag">try/catch</span>. Nếu lưu User thất bại, lập tức xóa <span class="code-tag">newAccount</span> để không bao giờ phát sinh tài khoản rác/mồ côi.
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 flex-shrink-0"></span> C. Luồng hoạt động & Cách các file liên kết với nhau
+          </h3>
+          <div class="relative bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-xs text-slate-400 p-2 text-right sm:hidden bg-slate-100 rounded-t-xl flex items-center justify-end gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+              <span>Vuốt ngang để xem sơ đồ</span>
+            </div>
+            <div class="mermaid-scroll-container overflow-x-auto p-2 sm:p-4 touch-pan-x">
+              <pre class="mermaid min-w-[650px] text-center">
+sequenceDiagram
+    autonumber
+    actor User as Người dùng
+    participant RP as RegisterPage.jsx
+    participant AR as authRoutes.js
+    participant ACtrl as authController.js
+    participant ES as emailService.js
+    participant DB as MongoDB (accounts, users, otps, roles)
+
+    User->>RP: Điền username, email, phone, password -> Bấm Tiếp tục
+    RP->>AR: POST /api/auth/register-init { username, email, phone, password }
+    AR->>ACtrl: registerInit()
+    ACtrl->>DB: Kiểm tra trùng lặp (Tự dọn dẹp tài khoản mồ côi nếu có)
+    ACtrl->>ACtrl: bcrypt.hash(password) & sinh OTP 6 số
+    ACtrl->>DB: Otp.findOneAndUpdate(..., payload, expiresAt)
+    ACtrl->>ES: sendOtpEmail(email, otpCode)
+    ES-->>User: Gửi email mã OTP xác nhận
+    ACtrl-->>RP: 200 OK (Chuyển sang màn hình nhập OTP)
+
+    User->>RP: Nhập 6 chữ số OTP
+    RP->>AR: POST /api/auth/register-verify-otp { email, otp }
+    AR->>ACtrl: registerVerifyOtp()
+    ACtrl->>DB: Otp.findOne({ email, type: 'register' })
+    ACtrl->>DB: Role.findOne({ code: 'renter' })
+    ACtrl->>DB: newAccount.save() -> Collection accounts
+    Note over ACtrl,DB: Giao dịch nguyên tử có cơ chế Rollback
+    alt Lưu newUser thất bại
+        ACtrl->>DB: Account.deleteOne({ _id: accountId }) (Rollback)
+        ACtrl-->>RP: 500 Lỗi kích hoạt
+    else Lưu newUser thành công
+        ACtrl->>DB: newUser.save() -> Collection users (referralCode tự sinh)
+        ACtrl->>DB: Otp.deleteOne({ _id })
+        ACtrl->>ACtrl: generateToken({ accountId, userId, role: 'renter' })
+        ACtrl-->>RP: 201 Created { token, account, user }
+        RP->>User: Tự động đăng nhập và vào trang chủ
+    end
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 7 -->
+      <section id="feature-7" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">7. TÍNH NĂNG 7: HỒ SƠ CÁ NHÂN & ĐỒNG BỘ TRUST SCORE (PROFILE)</h2>
+          <span class="bg-cyan-100 text-cyan-800 text-xs font-semibold px-2.5 py-1 rounded-full">Reputation & Profile</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-cyan-700 block mb-2 text-xs uppercase tracking-wider">Frontend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">client/src/pages/ProfilePage.jsx</span>: Hiển thị chi tiết hồ sơ cá nhân, ảnh đại diện, địa chỉ, các chỉ số tín nhiệm (KPI Cards) và nút chỉnh sửa thông tin.</li>
+                <li><span class="code-tag">client/src/services/uploadService.js</span>: Xử lý nén ảnh trên Canvas client và upload ảnh đại diện lên Cloudinary.</li>
+                <li><span class="code-tag">client/src/services/api.js</span>: Gọi các API lấy và cập nhật profile.</li>
+                <li><span class="code-tag">client/src/context/AuthContext.jsx</span>: Đồng bộ trạng thái người dùng mới nhất vào bộ nhớ và <span class="code-tag">localStorage</span>.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/routes/authRoutes.js</span> & <span class="code-tag">server/src/routes/userRoutes.js</span>: Endpoint <span class="code-tag">/api/auth/profile</span>, <span class="code-tag">/api/users/profile</span>, <span class="code-tag">/api/auth/me</span>.</li>
+                <li><span class="code-tag">server/src/controllers/authController.js</span>: Controller <span class="code-tag">getProfile</span>, <span class="code-tag">getCurrentUser</span>, <span class="code-tag">updateProfile</span>, <span class="code-tag">updateAvatar</span>.</li>
+                <li><span class="code-tag">server/src/services/reviewService.js</span>: Dịch vụ tính toán <span class="code-tag">syncUserRatingAndTrustScore</span>.</li>
+                <li><span class="code-tag">server/src/models/User.js</span>: Collection <span class="code-tag">users</span> lưu trữ <span class="code-tag">rating</span>, <span class="code-tag">totalReviews</span>, <span class="code-tag">trust.score</span>.</li>
+                <li><span class="code-tag">server/src/models/Review.js</span>: Collection <span class="code-tag">reviews</span> (nguồn dữ liệu tính toán số sao và lượt review).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend (<span class="code-tag">ProfilePage.jsx</span>):</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">fetchUserProfile()</span>: Gọi <span class="code-tag">api.get('/auth/profile')</span> mỗi khi tải hoặc reload trang.</li>
+                <li><span class="code-tag">handleAvatarUpload(e)</span>: Nén ảnh và upload lên Cloudinary, gọi <span class="code-tag">api.post('/users/avatar')</span>.</li>
+                <li><span class="code-tag">handleSaveProfile(e)</span>: Cập nhật họ tên, số điện thoại, địa chỉ qua <span class="code-tag">api.patch('/users/profile')</span>.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100 space-y-3">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend & Formula Engine:</strong>
+              <p><span class="code-tag">reviewService.js</span>: <span class="code-tag">syncUserRatingAndTrustScore(userId)</span></p>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li>Quét tất cả review hợp lệ trong collection <span class="code-tag">reviews</span> (và <span class="code-tag">rating</span>/<span class="code-tag">ratings</span> nếu có).</li>
+                <li>Tính <span class="code-tag">totalReviews</span> (số lượng review) và <span class="code-tag">avgRating = sum / count</span> (làm tròn 1 số thập phân).</li>
+                <li>Tính toán <span class="code-tag">trustScore</span> theo công thức bên dưới:</li>
+              </ul>
+              
+              <div class="py-3 px-4 bg-white rounded-xl border border-slate-200 text-center my-2 text-xs sm:text-sm overflow-x-auto shadow-inner">
+                $$\text{trustScore} = \min(100, \max(50, \text{round}(\text{avgRating} \times 20)))$$
+              </div>
+
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li>Cập nhật trực tiếp các trường <span class="code-tag">rating</span>, <span class="code-tag">totalReviews</span>, <span class="code-tag">trust.score</span>, <span class="code-tag">trustScore</span> vào collection <span class="code-tag">users</span> trong MongoDB.</li>
+              </ul>
+              <hr class="border-slate-200">
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">authController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">getProfile(req, res)</span>: Tự động gọi <span class="code-tag">syncUserRatingAndTrustScore()</span> trước khi trả dữ liệu User cho Client.</li>
+                    <li><span class="code-tag">getCurrentUser(req, res)</span>: Tương tự, đồng bộ danh tiếng người dùng khi gọi <span class="code-tag">/api/auth/me</span>.</li>
+                    <li><span class="code-tag">updateAvatar(req, res)</span>: Lưu link ảnh mới vào DB và xóa ảnh đại diện cũ trên Cloudinary.</li>
+                    <li><span class="code-tag">updateProfile(req, res)</span>: Cập nhật thông tin định danh và địa chỉ.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-600 flex-shrink-0"></span> C. Luồng hoạt động & Cách các file liên kết với nhau
+          </h3>
+          <ol class="list-decimal pl-5 space-y-2 text-xs sm:text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <li>Người dùng mở hoặc F5 lại trang Profile, <span class="code-tag">ProfilePage.jsx</span> kích hoạt <span class="code-tag">fetchUserProfile()</span>.</li>
+            <li>Client gửi <span class="code-tag">GET /api/auth/profile</span>.</li>
+            <li><span class="code-tag">authController.getProfile()</span> tiếp nhận request và gọi <span class="code-tag">reviewService.syncUserRatingAndTrustScore(userId)</span>.</li>
+            <li><span class="code-tag">syncUserRatingAndTrustScore()</span>:
+              <ul class="list-disc pl-4 mt-1 space-y-1 text-slate-500">
+                <li>Truy vấn collection <span class="code-tag">reviews</span> để tìm tất cả các review mà user là bên nhận (chủ máy hoặc người thuê).</li>
+                <li>Tính toán lại trung bình cộng số sao và quy đổi sang điểm tín nhiệm Trust Score theo thang 100.</li>
+                <li>Ghi đè các giá trị mới (<span class="code-tag">rating</span>, <span class="code-tag">totalReviews</span>, <span class="code-tag">trust.score</span>, <span class="code-tag">trustScore</span>) vào collection <span class="code-tag">users</span> trong MongoDB.</li>
+              </ul>
+            </li>
+            <li><span class="code-tag">authController.getProfile()</span> trả dữ liệu User đã được cập nhật về cho Client.</li>
+            <li><span class="code-tag">ProfilePage.jsx</span> nhận response, hiển thị:
+              <ul class="list-disc pl-4 mt-1 space-y-1 font-medium text-slate-700">
+                <li><strong>Trust Score:</strong> <span class="code-tag">{profile.trustScore ?? profile.trust?.score ?? 100} / 100</span></li>
+                <li><strong>Average Rating:</strong> <span class="code-tag">{profile.rating ?? 5.0} ★</span></li>
+                <li><strong>Lượt đánh giá:</strong> <span class="code-tag">{profile.totalReviews ?? 0} reviews</span></li>
+              </ul>
+            </li>
+            <li><span class="code-tag">ProfilePage.jsx</span> gọi <span class="code-tag">login()</span> của <span class="code-tag">AuthContext</span> để cập nhật đồng bộ cho toàn bộ ứng dụng.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Feature 8 -->
+      <section id="feature-8" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">8. TÍNH NĂNG 8: KHÓA TÀI KHOẢN & ĐĂNG XUẤT THỜI GIAN THỰC (BANNER / BAN ACCOUNT)</h2>
+          <span class="bg-rose-100 text-rose-800 text-xs font-semibold px-2.5 py-1 rounded-full">Real-time Security</span>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600 flex-shrink-0"></span> A. Danh sách các file tham gia
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-rose-700 block mb-2 text-xs uppercase tracking-wider">Client & Admin Frontend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">client/src/context/AuthContext.jsx</span>: Lắng nghe sự kiện WebSocket thời gian thực <span class="code-tag">account_banned</span>, tự động đăng xuất và hiển thị Modal thông báo khóa tài khoản tinh gọn.</li>
+                <li><span class="code-tag">client/src/services/api.js</span>: Bắt lỗi HTTP 403 (<span class="code-tag">isbanned: true</span>) từ bất kỳ API nào và kích hoạt đăng xuất ngay lập tức.</li>
+                <li><span class="code-tag">client/src/pages/LoginPage.jsx</span>: Hiển thị thông báo tài khoản bị khóa kèm lý do vi phạm nếu người dùng cố đăng nhập.</li>
+                <li><span class="code-tag">server/src/views/admin/user-manager.ejs</span>: Giao diện quản lý người dùng, hiển thị trạng thái <span class="code-tag">Active</span> / <span class="code-tag">Banned</span> và modal xác nhận khóa tài khoản với ô nhập lý do bắt buộc.</li>
+                <li><span class="code-tag">server/src/public/js/admin/user-manager.js</span>: Script bắt sự kiện click nút Khóa/Mở khóa, validate lý do khóa và gửi request.</li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-emerald-700 block mb-2 text-xs uppercase tracking-wider">Backend:</span>
+              <ul class="space-y-2 text-slate-600 list-disc pl-4">
+                <li><span class="code-tag">server/src/routes/adminBanRoutes.js</span>: Endpoint API khóa/mở khóa (<span class="code-tag">PATCH /api/admin/users/:id/ban</span>).</li>
+                <li><span class="code-tag">server/src/controllers/admin/adminBanController.js</span>: Controller kiểm tra quyền admin và điều phối hành động khóa.</li>
+                <li><span class="code-tag">server/src/services/banService.js</span>: Dịch vụ cập nhật trạng thái khóa đồng bộ vào DB và phát tín hiệu Socket.IO.</li>
+                <li><span class="code-tag">server/src/middlewares/banCheckMiddleware.js</span>: Middleware <span class="code-tag">checkAccountNotBanned</span> kiểm tra cấm trên các API nghiệp vụ.</li>
+                <li><span class="code-tag">server/src/socket.js</span>: Khởi tạo Socket.IO server và hàm phát sóng <span class="code-tag">emitAccountBanned</span>.</li>
+                <li><span class="code-tag">server/src/models/Account.js</span> & <span class="code-tag">server/src/models/User.js</span>: Lưu trường <span class="code-tag">isbanned</span>, <span class="code-tag">banReason</span>, <span class="code-tag">isActive</span>.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600 flex-shrink-0"></span> B. Danh sách hàm/phương thức sử dụng
+          </h3>
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700">
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">1. Frontend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">AuthContext.jsx</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">setupSocketListener()</span>: Đăng ký lắng nghe sự kiện <span class="code-tag">account_banned</span> từ Socket.IO.</li>
+                    <li><span class="code-tag">handleAccountBanned(event)</span>: So khớp ID, gọi <span class="code-tag">logout()</span>, hiển thị modal thông báo khóa tài khoản tinh gọn.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">public/js/admin/user-manager.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">handleBanConfirm()</span>: Kiểm tra ô lý do khóa không được để trống, gửi request <span class="code-tag">PATCH /api/admin/users/:id/ban</span>.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-100">
+              <strong class="text-slate-900 block mb-1.5 font-semibold">2. Backend:</strong>
+              <ul class="list-disc pl-4 space-y-1 text-slate-600">
+                <li><span class="code-tag">adminBanController.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">toggleUserBanStatus(req, res)</span>: Tiếp nhận yêu cầu khóa/mở khóa, kiểm tra lý do bắt buộc.</li>
+                    <li><span class="code-tag">getUserBanInfo(req, res)</span>: Lấy thông tin thời gian và lý do khóa.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">banService.js</span>:
+                  <ul class="list-circle pl-4 mt-1 space-y-1">
+                    <li><span class="code-tag">banAccount(targetId, banReason, adminId)</span>: Cập nhật collection <span class="code-tag">accounts</span>: <span class="code-tag">{ isbanned: true, banReason, bannedAt, isActive: false }</span>. Cập nhật collection <span class="code-tag">users</span>: <span class="code-tag">{ isbanned: true, banReason, isActive: false }</span>. Gọi <span class="code-tag">emitAccountBanned()</span> để đẩy sự kiện qua Socket.IO.</li>
+                    <li><span class="code-tag">unbanAccount(targetId, adminId)</span>: Khôi phục <span class="code-tag">{ isbanned: false, banReason: '', isActive: true }</span>.</li>
+                  </ul>
+                </li>
+                <li><span class="code-tag">socket.js</span>: <span class="code-tag">emitAccountBanned({ accountId, userId, reason })</span> - Phát broadcast sự kiện <span class="code-tag">account_banned</span> tới toàn bộ client đang kết nối.</li>
+                <li><span class="code-tag">banCheckMiddleware.js</span>: <span class="code-tag">checkAccountNotBanned(req, res, next)</span> - Chặn mọi request của tài khoản đã bị khóa với mã HTTP 403.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600 flex-shrink-0"></span> C. Luồng hoạt động WebSocket thời gian thực
+          </h3>
+          <div class="relative bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-xs text-slate-400 p-2 text-right sm:hidden bg-slate-100 rounded-t-xl flex items-center justify-end gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+              <span>Vuốt ngang để xem sơ đồ</span>
+            </div>
+            <div class="mermaid-scroll-container overflow-x-auto p-2 sm:p-4 touch-pan-x">
+              <pre class="mermaid min-w-[650px] text-center">
+sequenceDiagram
+    autonumber
+    actor Admin as Quản trị viên
+    participant UM as user-manager.js / EJS
+    participant BR as adminBanRoutes.js
+    participant BCtrl as adminBanController.js
+    participant BS as banService.js
+    participant DB as MongoDB (accounts, users)
+    participant SK as Socket.IO (socket.js)
+    actor Victim as Người dùng bị khóa
+    participant Client as AuthContext.jsx (Trình duyệt User)
+
+    Admin->>UM: Bấm nút "Khóa tài khoản", nhập lý do vi phạm
+    UM->>BR: PATCH /api/admin/users/:id/ban { isbanned: true, banReason }
+    BR->>BCtrl: toggleUserBanStatus()
+    BCtrl->>BS: banAccount(userId, banReason, adminId)
+    BS->>DB: accounts.updateOne(..., { isbanned: true, banReason, isActive: false })
+    BS->>DB: users.updateOne(..., { isbanned: true, banReason, isActive: false })
+    BS->>SK: emitAccountBanned({ accountId, userId, reason: banReason })
+    SK-->>Client: WebSocket Broadcast: 'account_banned'
+    Client->>Client: So khớp userId/accountId trùng khớp
+    Client->>Client: logout() xóa token và localStorage ngay lập tức
+    Client-->>Victim: Hiển thị Modal: "Tài khoản của bạn đã bị khóa. Lý do: ..."
+    BCtrl-->>UM: 200 OK (Cập nhật giao diện Admin sang trạng thái Banned)
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Summary Table Section -->
+      <section id="summary-table" class="bg-white rounded-2xl p-4 sm:p-7 shadow-sm border border-slate-200 scroll-mt-20 space-y-6">
+        <div class="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">TỔNG KẾT BẢNG ÁNH XẠ FILE - TÍNH NĂNG</h2>
+          <span class="bg-slate-100 text-slate-800 text-xs font-semibold px-2.5 py-1 rounded-full">Overview Matrix</span>
+        </div>
+
+        <div class="relative overflow-x-auto rounded-xl border border-slate-200">
+          <div class="text-xs text-slate-400 p-2 text-right sm:hidden bg-slate-100 border-b border-slate-200 flex items-center justify-end gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+            <span>Cuộn ngang để xem đầy đủ thông tin</span>
+          </div>
+          <table class="w-full text-left text-xs sm:text-sm text-slate-600 border-collapse min-w-[640px]">
+            <thead>
+              <tr class="bg-slate-900 text-white font-semibold sticky top-0 z-10">
+                <th class="p-3 text-center w-12 border-b border-slate-800">STT</th>
+                <th class="p-3 border-b border-slate-800 min-w-[120px]">Tính năng</th>
+                <th class="p-3 border-b border-slate-800">File Frontend chính</th>
+                <th class="p-3 border-b border-slate-800">File Backend chính</th>
+                <th class="p-3 border-b border-slate-800">Collections liên quan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">1</td>
+                <td class="p-3 font-semibold text-blue-600">Login</td>
+                <td class="p-3"><span class="code-tag">LoginPage.jsx</span><br><span class="code-tag">AuthContext.jsx</span><br><span class="code-tag">api.js</span></td>
+                <td class="p-3"><span class="code-tag">authRoutes.js</span><br><span class="code-tag">authController.js</span></td>
+                <td class="p-3"><span class="code-tag">accounts</span>, <span class="code-tag">users</span>, <span class="code-tag">roles</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">2</td>
+                <td class="p-3 font-semibold text-purple-600">Admin Login</td>
+                <td class="p-3"><span class="code-tag">login.ejs</span><br><span class="code-tag">public/js/admin/login.js</span></td>
+                <td class="p-3"><span class="code-tag">adminPageRoutes.js</span><br><span class="code-tag">adminPageController.js</span><br><span class="code-tag">adminPageAuthMiddleware.js</span></td>
+                <td class="p-3"><span class="code-tag">accounts</span>, <span class="code-tag">roles</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">3</td>
+                <td class="p-3 font-semibold text-amber-600">Forgot Password</td>
+                <td class="p-3"><span class="code-tag">ForgotPasswordPage.jsx</span><br><span class="code-tag">api.js</span></td>
+                <td class="p-3"><span class="code-tag">authRoutes.js</span><br><span class="code-tag">authController.js</span><br><span class="code-tag">emailService.js</span></td>
+                <td class="p-3"><span class="code-tag">accounts</span>, <span class="code-tag">otps</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">4</td>
+                <td class="p-3 font-semibold text-teal-600">eKYC Renter</td>
+                <td class="p-3"><span class="code-tag">ProfilePage.jsx</span><br><span class="code-tag">EkycSubmitModal.jsx</span><br><span class="code-tag">uploadService.js</span><br><span class="code-tag">ekyc-verification.ejs</span></td>
+                <td class="p-3"><span class="code-tag">ekycRoutes.js</span><br><span class="code-tag">ekycController.js</span><br><span class="code-tag">adminEkycRoutes.js</span><br><span class="code-tag">adminEkycController.js</span></td>
+                <td class="p-3"><span class="code-tag">ekyc_requests</span>, <span class="code-tag">users</span>, <span class="code-tag">accounts</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">5</td>
+                <td class="p-3 font-semibold text-indigo-600">eKYC Owner</td>
+                <td class="p-3"><span class="code-tag">ProfilePage.jsx</span><br><span class="code-tag">OwnerEkycSubmitModal.jsx</span><br><span class="code-tag">ownerEkycService.js</span><br><span class="code-tag">owner-ekyc-verification.ejs</span></td>
+                <td class="p-3"><span class="code-tag">ownerEkycRoutes.js</span><br><span class="code-tag">ownerEkycController.js</span><br><span class="code-tag">adminOwnerEkycRoutes.js</span><br><span class="code-tag">adminOwnerEkycController.js</span></td>
+                <td class="p-3"><span class="code-tag">owner_request</span>, <span class="code-tag">accounts</span>, <span class="code-tag">users</span>, <span class="code-tag">roles</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">6</td>
+                <td class="p-3 font-semibold text-emerald-600">Register</td>
+                <td class="p-3"><span class="code-tag">RegisterPage.jsx</span><br><span class="code-tag">AuthContext.jsx</span><br><span class="code-tag">api.js</span></td>
+                <td class="p-3"><span class="code-tag">authRoutes.js</span><br><span class="code-tag">authController.js</span><br><span class="code-tag">emailService.js</span></td>
+                <td class="p-3"><span class="code-tag">accounts</span>, <span class="code-tag">users</span>, <span class="code-tag">otps</span>, <span class="code-tag">roles</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">7</td>
+                <td class="p-3 font-semibold text-cyan-600">Profile</td>
+                <td class="p-3"><span class="code-tag">ProfilePage.jsx</span><br><span class="code-tag">uploadService.js</span><br><span class="code-tag">api.js</span></td>
+                <td class="p-3"><span class="code-tag">userRoutes.js</span><br><span class="code-tag">authController.js</span><br><span class="code-tag">reviewService.js</span></td>
+                <td class="p-3"><span class="code-tag">users</span>, <span class="code-tag">accounts</span>, <span class="code-tag">reviews</span></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-3 text-center font-bold text-slate-900">8</td>
+                <td class="p-3 font-semibold text-rose-600">Banner Account</td>
+                <td class="p-3"><span class="code-tag">AuthContext.jsx</span><br><span class="code-tag">user-manager.ejs</span><br><span class="code-tag">public/js/admin/user-manager.js</span></td>
+                <td class="p-3"><span class="code-tag">adminBanRoutes.js</span><br><span class="code-tag">adminBanController.js</span><br><span class="code-tag">banService.js</span><br><span class="code-tag">socket.js</span><br><span class="code-tag">banCheckMiddleware.js</span></td>
+                <td class="p-3"><span class="code-tag">accounts</span>, <span class="code-tag">users</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Floating Back-to-Top Button for Mobile/Tablet -->
+  <button id="scrollTopBtn" aria-label="Cuộn lên đầu trang" class="fixed bottom-5 right-5 z-40 bg-slate-900/90 hover:bg-slate-800 text-white p-3 rounded-full shadow-lg border border-slate-700 opacity-0 pointer-events-none transition-all duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+  </button>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 mt-16 py-8 text-center text-xs">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>© 2026 TechShare Architecture Documentation. Optimized for Mobile, Tablet & Desktop.</p>
+    </div>
+  </footer>
+
+  <!-- Script Controls -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mobile Drawer Toggle Logic
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+      const mobileDrawer = document.getElementById('mobileDrawer');
+      const drawerOverlay = document.getElementById('drawerOverlay');
+      const drawerLinks = document.querySelectorAll('.drawer-link');
+
+      function openDrawer() {
+        mobileDrawer.classList.remove('-translate-x-full');
+        drawerOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        document.body.classList.add('overflow-hidden');
+      }
+
+      function closeDrawer() {
+        mobileDrawer.classList.add('-translate-x-full');
+        drawerOverlay.classList.add('opacity-0', 'pointer-events-none');
+        document.body.classList.remove('overflow-hidden');
+      }
+
+      mobileMenuBtn?.addEventListener('click', openDrawer);
+      closeDrawerBtn?.addEventListener('click', closeDrawer);
+      drawerOverlay?.addEventListener('click', closeDrawer);
+
+      drawerLinks.forEach(link => {
+        link.addEventListener('click', closeDrawer);
+      });
+
+      // Scroll to Top Button Logic
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+          scrollTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+          scrollTopBtn.classList.add('opacity-0', 'pointer-events-none');
+        }
+      });
+
+      scrollTopBtn?.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
